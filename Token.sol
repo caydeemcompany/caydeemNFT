@@ -7,6 +7,7 @@ import "@openzeppelin/contracts/access/Ownable.sol";
 
 contract QRT is ERC20, Ownable {
   uint8 public _tax;
+  address public _rewards;
   address public _taxer;
   address public _liquidity;
   address public _ownerAddress;
@@ -19,13 +20,18 @@ contract QRT is ERC20, Ownable {
     _mint(msg.sender, 10000000 * 1 ether); // 10M
   }
 
+  function setRewardAddress(address rewardsConstract) external onlyOwner {
+    _rewards = rewardsConstract;
+  }
+
   function _transfer(address sender, address receiver, uint256 amount) internal virtual override {
     uint256 taxAmount = 0;
     
-    // if sender or receiver is different to owner, liquidity or taxer address, apply tax
+    // if sender or receiver is different to owner, liquidity, taxer or rewards address, apply tax
     if (sender != _ownerAddress && receiver != _ownerAddress 
         && sender != _liquidity && receiver != _liquidity
-        && sender != _taxer && receiver != _taxer) {
+        && sender != _taxer && receiver != _taxer
+        && sender != _rewards && receiver != _rewards) {
       taxAmount = (amount * _tax) / 100;
     }
     
